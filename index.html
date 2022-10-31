@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>API Access Project</title>
+        
+        <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+        
+        <style media="screen">
+            .buttons {
+				width: 200px;
+				height: 75px;
+				font-size: 17px;
+				background-color: #105a55;
+				color: #acc886;
+				border: none;
+				border-radius: 10px;
+			}
+
+			.buttons:hover {
+				background-color: #acc886;
+				color: #105a55;
+			}
+            
+            .btnContainer {
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                text-align: center;
+				
+				
+            }
+
+			.heading {
+				position: fixed;
+				width: 100%;
+				background-color: #105a55;
+				top: 0;
+				margin: 0;
+				display: block;
+				color: #acc886;
+				padding: 0; 
+				border: 0; 
+				outline: 0;
+			}
+            
+            .list {
+                display: none;
+                color: black;
+                margin-left: 2px;
+                margin-right: 5px;
+                
+            }
+            
+            .exp {
+                display:block;
+                padding: 5px;
+            }
+            
+            .container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin: 0 30%;
+				border-color: #105a55;
+			    border-style: double;
+                padding: 5px;
+                flex-direction: column;
+                text-align: left;
+			}
+        </style>
+        
+        
+        <script>
+    		function getAPIData() {
+    			/* Step 1: Make instance of request object...
+    			...to make HTTP request after page is loaded*/
+    			request = new XMLHttpRequest();
+    			console.log("1 - request object created");
+     
+    			// Step 2: Set the URL for the AJAX request to be the JSON file
+     
+    		request.open("GET", "http://universities.hipolabs.com/search?name=mountain&country=united states", true)
+    
+    			console.log("2 - opened request file");
+     
+    			// Step 3: set up event handler/callback
+    
+    			request.onreadystatechange = function() {
+    				console.log("3 - readystatechange event fired.");
+     
+    				if (request.readyState == 4 && request.status == 200) {
+    
+    					// Step 5: wait for done + success
+    					console.log("5 - response received");
+    					result = request.responseText;
+    					
+    					uniObj = JSON.parse(result);
+                        
+                        strHTML = "Here are your results for US universities containing the word 'mountain':<br><ul>";
+    					uniObj.forEach(function(uni) { 
+    					  strHTML += "<ul><li>Name: " + uni.name + "</li><li>Domain(s): "+ uni.domains.join(", ") + "</li><br></ul>";
+    					}) 
+    					strHTML += "</ul><br><br>You used the GET command!<br>";
+                        
+    					document.getElementById("data").innerHTML =strHTML; 
+    					
+    				}
+    				else if (request.readyState == 4 && request.status != 200) {
+    
+    					document.getElementById("data").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+    
+    				}
+    
+    				else if (request.readyState == 3) {
+    
+    					document.getElementById("data").innerHTML = "Too soon!  Try again";
+    
+    				}
+    
+    			}
+    		// Step 4: fire off the HTTP request
+    			request.send();
+    			console.log("4 - Request sent");
+    		}
+            
+            function fetchAPIData() {
+                res = 
+                fetch("http://universities.hipolabs.com/search?name=mountain&country=united states")
+                    .then (res => res.text())
+                    .then (data => 
+                    {
+                        uniObj = JSON.parse(data)
+                        
+                        
+                        strHTML = "<ul>";
+    					uniObj.forEach(function(uni) { 
+    					  strHTML += "<ul><li>Name: " + uni.name + "</li><li>Domain(s): "+ uni.domains.join(", ") + "</li><br></ul>";
+    					}) 
+    					strHTML += "</ul>";
+                        
+    					document.getElementById("data").innerHTML ="Here are your results for US universities containing the word 'mountain':<br>" + strHTML +"<br><br>You used the fetch command!<br>"; 
+                        
+                    })
+                    .catch (error => console.log(error))
+            
+            
+            
+            }
+            
+            
+    	</script>
+        
+        
+    </head>
+    <body style="margin: 0">
+        
+        
+        
+        <div class="heading">
+            <div class="btnContainer">
+                <button type="button" class="buttons" name="btn1" onclick="getAPIData()">Get API Data</button>
+                
+                <button type="button" class="buttons" name="btn2" onclick="fetchAPIData()">Fetch API Data</button>
+                
+                <button type="button" class="buttons" name="btn3" id="btn3">Read about the API</button>
+            </div>
+        </div>
+        <br><br><br><br><br><br><br><br><br>
+        
+        <div class="container">
+            <div class="result" id="data">Click a button to display the API Data!</div>
+            
+            <div class="exp" id="info">
+                
+                <ul class="list" id="uList"><h2>API Info:</h2>
+                    <li>The hipolabs university domains list API contains the following information about universities all around the globe: country, name, domain, web pages, country code, and state/province. It allows you to search for universities containing a certain word in a specific country or just anywhere in the world. For example, I searched for unversities in the US that have 'mountain' in their name.</li>
+                    <li><a target="_blank" href="https://mixedanalytics.com/blog/list-actually-free-open-no-auth-needed-apis/">This website</a> is where I found the link to the API, and <a target="_blank" href="https://github.com/Hipo/university-domains-list-api">this website</a> is where I found the actual API data.</li>
+                    <li>The options I used for the API request were the country and name of the university. The API does not require any options to refine the search, and you can filter your results by specifying a value for any of the attributes listed in the API description.</li>
+                    <li>Applications where this API would be useful: <br><ol>
+                        <li>High school students who want to know which universities are in their state/province can get a list my entering their region into the search query options.</li>
+                        <li>A college student that wants to study abroad in a specific country, but doesn't know what universities they have there could enter that country into the search query options. </li>
+                    </ol></li>
+                </ul>
+                
+            </div>
+        </div>
+        <br><br>
+        
+        
+        <script type="text/javascript">
+            
+            $("#btn3").click(function() {
+                
+                if (document.getElementById("uList").style.display === 'none') {
+                    
+                    document.getElementById("uList").style.display = "block";
+                } else {
+                    
+                    document.getElementById("uList").style.display = "none";
+                }
+                
+            });
+            
+        </script>
+    </body>
+</html>
